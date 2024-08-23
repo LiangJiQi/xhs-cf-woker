@@ -5,35 +5,28 @@ async function get_img_urls(url) {
       "headers": {
         "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
         "accept-language": "zh-CN,zh;q=0.9",
-        "priority": "u=0, i",
-        "sec-ch-ua": "\"Not)A;Brand\";v=\"99\", \"Google Chrome\";v=\"127\", \"Chromium\";v=\"127\"",
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": "\"Windows\"",
-        "sec-fetch-dest": "document",
-        "sec-fetch-mode": "navigate",
-        "sec-fetch-site": "none",
-        "sec-fetch-user": "?1",
         "upgrade-insecure-requests": "1"
       },
       "body": null,
-      "method": "GET"
+      "method": "GET",
     });
     if (!response.ok) {
       throw new Error(`Response status: ${response.status}`);
     }
 
     const response_text = await response.text()
-    var imgs = response_text.match(/<meta name="og:image" content=(.*)>/g)
-    if(imgs == null){
-      return imgs
+    const img_labels = response_text.match(/<meta name="og:image" content=(.*)>/g)
+    if(img_labels == null){
+      return img_labels
     }
-    for (var i=0;i<imgs.length;i++)
+    var img_urls = new Array()
+    for (var i=0;i<img_labels.length;i++)
     { 
-        var img_url = imgs[i].match(/(?<=content\=).*/)
+        var img_url = img_labels[i].match(/(?<=content\=).*/)
         img_url = img_url[0].match(/[^\"*].*[^\"\>*]/)
-        imgs[i] = img_url
+        img_urls[i] = img_url
     }
-    return imgs
+    return img_urls
   } catch (error) {
     console.error(error.message);
   }
@@ -58,6 +51,7 @@ function response_html(imgs) {
       "content-type": "text/html;charset=UTF-8",
     },
   });
+  
 }
 
 function get_share_url(request_url){
