@@ -5,7 +5,10 @@ async function get_img_urls(url) {
       "headers": {
         "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
         "accept-language": "zh-CN,zh;q=0.9",
-        "upgrade-insecure-requests": "1"
+        "Accept-Encoding": "gzip, deflate",
+        "Host": "xhslink.com",
+        "upgrade-insecure-requests": "1",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
       },
       "body": null,
       "method": "GET",
