@@ -16,15 +16,14 @@ async function get_img_urls(url) {
 
     const response_text = await response.text()
     const img_labels = response_text.match(/<meta name="og:image" content=(.*)>/g)
-    if(img_labels == null){
-      return img_labels
+    if (img_labels == null) {
+      return response_text
     }
     var img_urls = new Array()
-    for (var i=0;i<img_labels.length;i++)
-    { 
-        var img_url = img_labels[i].match(/(?<=content\=).*/)
-        img_url = img_url[0].match(/[^\"*].*[^\"\>*]/)
-        img_urls[i] = img_url
+    for (var i = 0; i < img_labels.length; i++) {
+      var img_url = img_labels[i].match(/(?<=content\=).*/)
+      img_url = img_url[0].match(/[^\"*].*[^\"\>*]/)
+      img_urls[i] = img_url
     }
     return img_urls
   } catch (error) {
@@ -38,9 +37,8 @@ function response_html(imgs) {
   `;
   const html_back = `
   </body>`;
-  for (var i=0;i<imgs.length;i++)
-  { 
-    imgs[i] = '<img src="' + imgs[i] +  '" alt="' + i.toString() + '"></img>'
+  for (var i = 0; i < imgs.length; i++) {
+    imgs[i] = '<img src="' + imgs[i] + '" alt="' + i.toString() + '"></img>'
   }
   var body = imgs.join('\n')
   const html = html_front + body + html_back
@@ -51,17 +49,17 @@ function response_html(imgs) {
       "content-type": "text/html;charset=UTF-8",
     },
   });
-  
+
 }
 
-function get_share_url(request_url){
+function get_share_url(request_url) {
   const decode_request_url = decodeURI(request_url)
   const share = decode_request_url.match(/(?<=share\=).*/)
-  if(share == null){
+  if (share == null) {
     return share
   }
-  const urls = share[0].match(/http.*\/\/.*[^']/);
-  if(urls == null){
+  const urls = share[0].match(/http.*\:\/\/.*[^'"]/);
+  if (urls == null) {
     return urls
   }
   const url = urls[0]
@@ -69,29 +67,36 @@ function get_share_url(request_url){
   return url
 }
 
-function response_error(error_str){
+function response_error(error_str) {
   const html_front = `<!DOCTYPE html>
       <body>
         <h1>`
   const html_back = `</h1>
       </body>`;
   const html = html_front + error_str + html_back
-      return new Response(html, {
-        headers: {
-          "content-type": "text/html;charset=UTF-8",
-        },
-      });
+  return new Response(html, {
+    headers: {
+      "content-type": "text/html;charset=UTF-8",
+    },
+  });
 }
 
 export default {
   async fetch(request, env, ctx) {
     const share_url = get_share_url(request.url)
-    if(share_url == null){
+    if (share_url == null) {
       return response_error('url error')
     }
     const img_urls = await get_img_urls(share_url);
-    if(img_urls == null){
+    if (img_urls == null) {
       return response_error('get img error')
+    }
+    else if (!Array.isArray(img_urls)) {
+      return new Response(img_urls, {
+        headers: {
+          "content-type": "text/html;charset=UTF-8",
+        },
+      });
     }
     return response_html(img_urls);
   },
